@@ -1,0 +1,46 @@
+#!/bin/bash
+begin=$(date +"%s")
+echo "${GREEN}behoimi.org bulk downloader"
+
+echo "tags/allias:" # tags e
+read -r INIT
+echo "count:" # jumlah e
+read -r count
+
+echo -e "reading source for /${GREEN}$INIT ..
+${WHITE}"
+
+REQUEST="${INIT}"
+    getUA() {
+        cat refer.json | jq -r '.ua' # iso go auto curl nek gelem
+    }
+    UA=$(getUA)
+
+        getREFER() {
+            cat refer.json | jq -r '.ref' # langsung request seko apine http://behoimi.org/post/index.xml
+        }
+        REFER=$(getREFER)
+
+            delt(){
+                rm *.txt | rm *.html
+            }
+            
+
+json="cat ${INIT}.html"
+echo ${GREEN}$REQUEST
+
+    mkdir -pv "./res/behoimi~${REQUEST}"
+
+        cd "./res/behoimi~${REQUEST}";
+
+            #refer and ua issues
+            wget --header="Accept: text/html" --user-agent="${UA}" --referer ${REFER} -O ${INIT}.html "http://behoimi.org/post/index.xml?limit=${count}&commit=Search&tags=${INIT}";
+
+                ${json} | grep -o 'file_url="[^"]*' | sed 's/file_url="//g' > links.txt;
+                wget --header="Accept: text/html" --user-agent="${UA}" --referer ${REFER} -i links.txt # -i $argv = ora ngehide process
+                purge=$(delt)
+
+#length
+termin=$(date +"%s")
+difftimelps=$(($termin-$begin))
+echo "${WHITE}$(($difftimelps / 60)) minutes and $(($difftimelps % 60)) sec. elapsed ${RED}behoifer"
